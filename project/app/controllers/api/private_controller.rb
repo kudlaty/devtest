@@ -4,7 +4,9 @@ class Api::PrivateController < Api::PrivatePublicController
   before_action :authorize_user
   
   def evaluate_target
-    evaluate_target = EvaluateTarget.new(evaluate_target_params.to_h)
+    
+    evaluate_target = EvaluateTarget.new(params)
+    
     unless evaluate_target.valid?
       render json: {errors: evaluate_target.errors.full_messages}, status: 422
     else
@@ -16,10 +18,6 @@ class Api::PrivateController < Api::PrivatePublicController
   end
   
   private
-  
-  def evaluate_target_params
-    params.permit(:country_code, :target_group_id, locations: [:id, :panel_size])
-  end
   
   def authorize_user
     token = request.env["HTTP_AUTHORIZATION"].try(:gsub!, /^Bearer /, '')
