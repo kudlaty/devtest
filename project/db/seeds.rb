@@ -11,10 +11,10 @@ COUNTRIES = [
 ].freeze
 
 LOCATION_GROUPS = [
-  { name: "Location Group 1", panel_provider_code: "times_a", country_code: "PL" },
-  { name: "Location Group 2", panel_provider_code: "10_arrays", country_code: "US" },
-  { name: "Location Group 3", panel_provider_code: "times_html", country_code: "UK" },
-  { name: "Location Group 4", panel_provider_code: "times_a", country_code: "US" }
+  { name: "LG1 #{FFaker::AddressUS.state}", panel_provider_code: "times_a", country_code: "PL" },
+  { name: "LG2 #{FFaker::AddressUS.state}", panel_provider_code: "10_arrays", country_code: "US" },
+  { name: "LG3 #{FFaker::AddressUS.state}", panel_provider_code: "times_html", country_code: "UK" },
+  { name: "LG4 #{FFaker::AddressUS.state}", panel_provider_code: "times_a", country_code: "US" }
 ]
 
 LOCATIONS = [
@@ -38,6 +38,13 @@ LOCATIONS = [
   { name: "Detroit" },
   { name: "El Paso" },
   { name: "Seattle" }
+].freeze
+
+TARGET_GROUPS = [
+  { name: "TG1 #{FFaker::Lorem.word}", panel_provider_code: 'times_a', country_codes: ['PL','US'] },
+  { name: "TG2 #{FFaker::Lorem.word}", panel_provider_code: '10_arrays', country_codes: ['PL','US','UK'] },
+  { name: "TG3 #{FFaker::Lorem.word}", panel_provider_code: 'times_html', country_codes: ['US'] },
+  { name: "TG4 #{FFaker::Lorem.word}", panel_provider_code: PANEL_PROVIDERS_CODES.sample, country_codes: ['US','UK'] }
 ].freeze
 
 USERS = [
@@ -71,5 +78,28 @@ LOCATIONS.each do |location|
     location_group: LocationGroup.all.sample,
     external_id: SecureRandom.uuid,
     secret_code: SecureRandom.hex(64)
-  )  
+  )
+end
+
+def child_target_groups level, max_level
+  return [] if level > max_level
+  (1..rand(2..6)).map do
+    TargetGroup.create!(
+      name: FFaker::Lorem.word.capitalize,
+      external_id: SecureRandom.uuid,
+      secret_code: SecureRandom.hex(64),
+      target_groups: child_target_groups(level+1, max_level)
+    )
+  end
+end
+
+TARGET_GROUPS.each do |tg|
+  TargetGroup.create!(
+    name: tg.fetch(:name).capitalize,
+    panel_provider: PanelProvider.find_by!(code: tg.fetch(:panel_provider_code)),
+    external_id: SecureRandom.uuid,
+    secret_code: SecureRandom.hex(64),
+    target_groups: child_target_groups(1, rand(3..5)),
+    countries: Country.where(code: tg.fetch(:country_codes))
+  )
 end

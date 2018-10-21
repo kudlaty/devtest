@@ -55,7 +55,7 @@ ActiveRecord::Schema.define(version: 2018_10_18_101141) do
 
   create_table "target_groups", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
     t.string "name"
-    t.integer "external_id"
+    t.string "external_id"
     t.integer "parent_id"
     t.string "secret_code"
     t.integer "panel_provider_id"
