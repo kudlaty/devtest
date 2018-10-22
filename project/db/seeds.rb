@@ -83,7 +83,7 @@ end
 
 def child_target_groups level, max_level
   return [] if level > max_level
-  (1..rand(2..6)).map do
+  (1..rand(2..4)).map do
     TargetGroup.create!(
       name: FFaker::Lorem.word.capitalize,
       external_id: SecureRandom.uuid,
@@ -99,7 +99,7 @@ TARGET_GROUPS.each do |tg|
     panel_provider: PanelProvider.find_by!(code: tg.fetch(:panel_provider_code)),
     external_id: SecureRandom.uuid,
     secret_code: SecureRandom.hex(64),
-    target_groups: child_target_groups(1, rand(3..5)),
+    target_groups: child_target_groups(1, rand(3..4)),
     countries: Country.where(code: tg.fetch(:country_codes))
   )
 end

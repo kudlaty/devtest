@@ -1,4 +1,6 @@
 class Api::PrivatePublicController < ApplicationController
+
+  skip_forgery_protection
   
   def locations
     
